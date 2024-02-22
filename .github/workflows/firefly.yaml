@@ -16,12 +16,13 @@ on:
 jobs:
   setup:
     runs-on: ubuntu-latest
+    environment: Sandbox1
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Terraform
-      uses: hashicorp/setup-terraform@v1
+      uses: hashicorp/setup-terraform@v3
       with:
           terraform_wrapper: false
           terraform_version: "1.6.5"
@@ -45,7 +46,7 @@ jobs:
         curl -O https://gofirefly-prod-iac-ci-cli-binaries.s3.amazonaws.com/fireflyci/latest/fireflyci_Linux_x86_64.tar.gz
         tar -xf fireflyci_Linux_x86_64.tar.gz
         chmod a+x fireflyci
-        ./fireflyci post-plan -f plan.json --timeout 180 --workspace FF-AWS --access-key ${{ secrets.FIREFLY_ACCESS_KEY }} --secret-key ${{ secrets.FIREFLY_SECRET_KEY }}
+        ./fireflyci post-plan -f plan.json --timeout 180 --workspace Firefly-AWS-Sandbox --access-key ${{ secrets.FIREFLY_ACCESS_KEY }} --secret-key ${{ secrets.FIREFLY_SECRET_KEY }}
 
     # - name: Terraform Apply
         # env:
