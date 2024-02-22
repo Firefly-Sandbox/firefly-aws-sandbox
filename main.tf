@@ -39,61 +39,20 @@ resource "aws_s3_bucket_ownership_controls" "firefly-sandbox-s3" {
   }
 }
 
-# resource "aws_s3_bucket_policy" "firefly-sandbox-s3" {
-#   bucket = "${aws_s3_bucket.firefly-sandbox-s3.id}"
-#   policy = jsonencode({
-#   "Statement": [
-#     {
-#       "Action": "s3:GetObject",
-#       "Effect": "Allow",
-#       "Principal": "*",
-#       "Resource": "${aws_s3_bucket.firefly-sandbox-s3.arn}/*",
-#       "Sid": "PublicReadGetObject"
-#     }
-#   ],
-#   "Version": "2012-10-17"
-# })
-# }
-
-# resource "aws_s3_bucket_acl" "firefly-sandbox-s3" {
-#   access_control_policy {
-#     grant {
-#       grantee {
-#         type = "Group"
-#         uri  = "http://acs.amazonaws.com/groups/global/AllUsers"
-#       }
-#       permission = "READ_ACP"
-#     }
-#     grant {
-#       grantee {
-#         type = "Group"
-#         uri  = "http://acs.amazonaws.com/groups/global/AuthenticatedUsers"
-#       }
-#       permission = "READ_ACP"
-#     }
-#     grant {
-#       grantee {
-#         type = "Group"
-#         uri  = "http://acs.amazonaws.com/groups/s3/LogDelivery"
-#       }
-#       permission = "READ_ACP"
-#     }
-#     grant {
-#       grantee {
-#         id   = "7db6dd8ef499c1b71362e5a8bad83bfd483878ec0f8b965f90686ac84980acdb"
-#         type = "CanonicalUser"
-#       }
-#       permission = "FULL_CONTROL"
-#     }
-#     owner {
-#       display_name = "daquinox+AWSGeneral"
-#       id           = "7db6dd8ef499c1b71362e5a8bad83bfd483878ec0f8b965f90686ac84980acdb"
-#     }
-#   }
-#   bucket = "${aws_s3_bucket.firefly-sandbox-s3.id}"
-# }
-
-
+resource "aws_dynamodb_table" "firefly-sandbox-dynamodb" {
+  attribute {
+    name = "firefly-metadata"
+    type = "S"
+  }
+  hash_key       = "firefly-metadata"
+  name           = "firefly-sandbox-dynamodb"
+  read_capacity  = 1
+  stream_enabled = false
+  tags = {
+    purpose = "firefly-sandbox"
+  }
+  write_capacity = 1
+}
 
 resource "aws_lambda_function" "firefly-sandbox-lambda" {
   architectures = ["x86_64"]
