@@ -150,3 +150,145 @@ resource "aws_security_group" "firefly-sandbox-ghost" {
   }
 }
 
+
+resource "aws_iam_role" "GItHubActions-782" {
+  assume_role_policy = jsonencode({
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::590184073875:oidc-provider/token.actions.githubusercontent.com"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+        },
+        "StringLike": {
+          "token.actions.githubusercontent.com:sub": "repo:Firefly-Sandbox/*"
+        }
+      }
+    }
+  ]
+})
+  inline_policy {
+    name   = "TerraformLockAccess"
+    policy = jsonencode({
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "VisualEditor0",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:PutItem",
+        "dynamodb:ListTabless",
+        "dynamodb:DeleteItem"
+      ],
+      "Resource": "*"
+    }
+  ]
+})
+  }
+  managed_policy_arns = ["arn:aws:iam::aws:policy/ReadOnlyAccess"]
+  name   = var.iam_role_use_name_prefix ? null : var.iam_role_name   # e.g. GItHubActions
+  tags = merge(var.tags, var.iam_role_tags)
+}
+
+
+resource "aws_vpc" "Fargate-Internal-217" {
+  cidr_block                     = var.use_ipam_pool ? null : var.cidr   # e.g. 10.0.0.0/24
+  enable_classiclink_dns_support = false
+  tags = merge(
+    var.tags,
+    var.vpc_tags,
+  )
+}
+
+
+resource "aws_default_network_acl" "acl-07198e3a534db93dc-8de" {
+  default_network_acl_id = "acl-07198e3a534db93dc"
+  egress {
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 0
+    protocol   = "-1"
+    rule_no    = 100
+    to_port    = 0
+  }
+  ingress {
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 0
+    protocol   = "-1"
+    rule_no    = 100
+    to_port    = 0
+  }
+}
+
+
+resource "aws_route_table" "rtb-064898d79749b3008-b34" {
+  vpc_id = "${aws_vpc.vpc-060c03b3f03576a62.id}"
+}
+
+
+resource "aws_iam_role" "AmazonEKSFargatePodExecutionRole-e00" {
+  assume_role_policy  = jsonencode({
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "eks-fargate-pods.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole",
+      "Condition": {
+        "ArnLike": {
+          "aws:SourceArn": "arn:aws:eks:us-east-1:590184073875:fargateprofile/Firefly-Sandbox-EKS/*"
+        }
+      }
+    }
+  ]
+})
+  description         = var.iam_role_description   # e.g. Allows access to other AWS service resources that are required to run Amazon EKS pods on AWS Fargate.
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonEKSFargatePodExecutionRolePolicy"]
+  name                = var.iam_role_use_name_prefix-e00d ? null : var.iam_role_name-e00d   # e.g. AmazonEKSFargatePodExecutionRole
+  tags = merge(var.tags, var.iam_role_tags)
+}
+
+
+resource "aws_vpc" "firefly-sandbox-vpc-02f" {
+  cidr_block                     = var.use_ipam_pool-02f0 ? null : var.cidr-02f   # e.g. 10.0.0.0/24
+  enable_classiclink_dns_support = false
+  tags = merge(
+    var.tags,
+    var.vpc_tags,
+  )
+}
+
+
+resource "aws_route_table" "rtb-0dc6d472eaf87747b-dec" {
+  vpc_id = "${aws_vpc.vpc-037dc00595a0092f8.id}"
+}
+
+
+resource "aws_default_network_acl" "acl-0ea4c444fb06f0516-86d" {
+  default_network_acl_id = "acl-0ea4c444fb06f0516"
+  egress {
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 0
+    protocol   = "-1"
+    rule_no    = 100
+    to_port    = 0
+  }
+  ingress {
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 0
+    protocol   = "-1"
+    rule_no    = 100
+    to_port    = 0
+  }
+}
+
