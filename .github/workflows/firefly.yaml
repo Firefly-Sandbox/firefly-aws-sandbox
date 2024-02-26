@@ -46,7 +46,7 @@ jobs:
         curl -O https://gofirefly-prod-iac-ci-cli-binaries.s3.amazonaws.com/fireflyci/latest/fireflyci_Linux_x86_64.tar.gz
         tar -xf fireflyci_Linux_x86_64.tar.gz
         chmod a+x fireflyci
-        ./fireflyci post-plan -f plan.json --timeout 180 --workspace Firefly-AWS-Sandbox --access-key ${{ secrets.FIREFLY_ACCESS_KEY }} --secret-key ${{ secrets.FIREFLY_SECRET_KEY }}
+        ./fireflyci post-plan -f plan.json --timeout 180 --workspace Acme-AWS-Prod --access-key ${{ secrets.FIREFLY_ACCESS_KEY }} --secret-key ${{ secrets.FIREFLY_SECRET_KEY }}
 
     # - name: Terraform Apply
         # env:
