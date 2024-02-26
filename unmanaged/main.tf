@@ -18,7 +18,7 @@ resource "aws_s3_bucket" "terraform_state" {
   }
 }
 
-resource "aws_security_group" "firefly-sandbox-ghost" {}
+# resource "aws_security_group" "acme-prod-ghost" {}
 
 resource "aws_s3_bucket_versioning" "terraform_state" {
     bucket = "tfstate-${random_string.UUID.result}"
@@ -40,32 +40,16 @@ resource "aws_dynamodb_table" "terraform_state_lock" {
   }
 }
 
-resource "aws_dynamodb_table" "firefly-sandbox-dynamodb" {
-  attribute {
-    name = "firefly-metadata"
-    type = "S"
-  }
-  hash_key       = "firefly-metadata"
-  name           = "firefly-sandbox-dynamodb"
-  read_capacity  = 1
-  stream_enabled = false
-  table_class    = "STANDARD"
-  tags = {
-    purpose = "firefly-sandbox"
-  }
-  write_capacity = 1
-}
-
-resource "aws_vpc" "firefly-sandbox-vpc" {
+resource "aws_vpc" "acme-prod-vpc" {
   cidr_block                     = "10.0.0.0/24"
   tags = {
-    Name    = "firefly-sandbox-vpc"
-    purpose = "firefly-sandbox"
+    Name    = "acme-prod-vpc"
+    purpose = "acme-prod"
   }
 }
 
-resource "aws_security_group" "firefly-sandbox-drift" {
-  description = "sandbox drifted resources"
+resource "aws_security_group" "acme-prod-drift" {
+  description = "prod drifted resources"
   egress {
     cidr_blocks = ["0.0.0.0/0"]
     from_port   = 0
@@ -78,12 +62,12 @@ resource "aws_security_group" "firefly-sandbox-drift" {
     protocol    = "tcp"
     to_port     = 3389
   }
-  name = "firefly-sandbox-drift"
+  name = "acme-prod-drift"
   tags = {
-    Name    = "firefly-sandbox-drift"
-    purpose = "firefly-sandbox"
+    Name    = "acme-prod-drift"
+    purpose = "acme-prod"
   }
-  vpc_id = aws_vpc.firefly-sandbox-vpc.id
+  vpc_id = aws_vpc.acme-prod-vpc.id
   # The following attributes have default values introduced when importing the resource into terraform: [revoke_rules_on_delete timeouts]
   lifecycle {
     ignore_changes = [revoke_rules_on_delete, timeouts]
@@ -95,7 +79,7 @@ output "bucket_name" {
   description = "The name of the bucket"
 }
 
-output "firefly_sandbox_vpc" {
-  value = aws_vpc.firefly-sandbox-vpc.id
+output "acme_prod_vpc" {
+  value = aws_vpc.acme-prod-vpc.id
   description = "Firefly Sandboc VPC ID"
 }

@@ -11,15 +11,15 @@ resource "random_string" "UUID" {
 }
 
 
-resource "aws_s3_bucket" "firefly-sandbox-s3" {
-  bucket = "firefly-sandbox-s3-${random_string.UUID.result}"
+resource "aws_s3_bucket" "acme-prod-s3" {
+  bucket = "acme-prod-s3-${random_string.UUID.result}"
   tags = {
-    purpose = "firefly-sandbox"
+    purpose = "acme-prod"
   }
 }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "firefly-sandbox-s3" {
-  bucket = "${aws_s3_bucket.firefly-sandbox-s3.id}"
+resource "aws_s3_bucket_server_side_encryption_configuration" "acme-prod-s3" {
+  bucket = "${aws_s3_bucket.acme-prod-s3.id}"
   rule {
     apply_server_side_encryption_by_default {
       sse_algorithm = "AES256"
@@ -28,45 +28,45 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "firefly-sandbox-s
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "firefly-sandbox-s3" {
-  bucket = "${aws_s3_bucket.firefly-sandbox-s3.id}"
+resource "aws_s3_bucket_public_access_block" "acme-prod-s3" {
+  bucket = "${aws_s3_bucket.acme-prod-s3.id}"
 }
 
-resource "aws_s3_bucket_ownership_controls" "firefly-sandbox-s3" {
-  bucket = "${aws_s3_bucket.firefly-sandbox-s3.id}"
+resource "aws_s3_bucket_ownership_controls" "acme-prod-s3" {
+  bucket = "${aws_s3_bucket.acme-prod-s3.id}"
   rule {
     object_ownership = "ObjectWriter"
   }
 }
 
-resource "aws_dynamodb_table" "firefly-sandbox-dynamodb" {
+resource "aws_dynamodb_table" "acme-prod-dynamodb" {
   attribute {
-    name = "firefly-metadata"
+    name = "acme-metadata"
     type = "S"
   }
-  hash_key       = "firefly-metadata"
-  name           = "firefly-sandbox-dynamodb"
+  hash_key       = "acme-metadata"
+  name           = "acme-prod-dynamodb"
   read_capacity  = 1
   stream_enabled = false
   tags = {
-    purpose = "firefly-sandbox"
+    purpose = "acme-prod"
   }
   write_capacity = 1
 }
 
-resource "aws_lambda_function" "firefly-sandbox-lambda" {
+resource "aws_lambda_function" "acme-prod-lambda" {
   architectures = ["x86_64"]
   description   = "A starter AWS Lambda function."
-  function_name = "firefly-sandbox-lambda"
+  function_name = "acme-prod-lambda"
   handler       = "index.handler"
-  //role          = "arn:aws:iam::821020995254:role/firefly-sandbox-lamdba-role"
-  role          = "${aws_iam_role.firefly-sandbox-lamdba-role.arn}"
+  //role          = "arn:aws:iam::821020995254:role/acme-prod-lamdba-role"
+  role          = "${aws_iam_role.acme-prod-lamdba-role.arn}"
   runtime       = "nodejs18.x"
   s3_bucket     = "firefly-lambda-zipstor"
   s3_key        = "firefly-demo-lambda.zip"
   tags = {
     "lambda-console:blueprint" = "hello-world"
-    purpose                    = "firefly-sandbox"
+    purpose                    = "acme-prod"
   }
   tracing_config {
     mode = "PassThrough"
@@ -77,7 +77,7 @@ resource "aws_lambda_function" "firefly-sandbox-lambda" {
   }
 }
 
-resource "aws_iam_role" "firefly-sandbox-lamdba-role" {
+resource "aws_iam_role" "acme-prod-lamdba-role" {
   assume_role_policy  = jsonencode({
   "Version": "2012-10-17",
   "Statement": [
@@ -92,13 +92,13 @@ resource "aws_iam_role" "firefly-sandbox-lamdba-role" {
 })
   description         = "Allows Lambda functions to call AWS services on your behalf."
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
-  name                = "firefly-sandbox-lamdba-role"
+  name                = "acme-prod-lamdba-role"
   tags = {
-    purpose = "firefly-sandbox"
+    purpose = "acme-prod"
   }
 }
 
-resource "aws_security_group" "firefly-sandbox-drift" {
+resource "aws_security_group" "acme-prod-drift" {
   description = "sandbox drifted resources"
   egress {
     cidr_blocks = ["0.0.0.0/0"]
@@ -112,19 +112,19 @@ resource "aws_security_group" "firefly-sandbox-drift" {
     protocol    = "tcp"
     to_port     = 22
   }
-  name = "firefly-sandbox-drift"
+  name = "acme-prod-drift"
   tags = {
-    Name    = "firefly-sandbox-drift"
-    purpose = "firefly-sandbox"
+    Name    = "acme-prod-drift"
+    purpose = "acme-prod"
   }
-  vpc_id = "vpc-037dc00595a0092f8"
+  vpc_id = "vpc-0a9f81e0f33455180"
   # The following attributes have default values introduced when importing the resource into terraform: [revoke_rules_on_delete timeouts]
   lifecycle {
     ignore_changes = [revoke_rules_on_delete, timeouts]
   }
 }
 
-resource "aws_security_group" "firefly-sandbox-ghost" {
+resource "aws_security_group" "acme-prod-ghost" {
   description = "sandbox ghosted resources"
   egress {
     cidr_blocks = ["0.0.0.0/0"]
@@ -138,12 +138,12 @@ resource "aws_security_group" "firefly-sandbox-ghost" {
     protocol    = "tcp"
     to_port     = 3389
   }
-  name = "firefly-sandbox-ghost"
+  name = "acme-prod-ghost"
   tags = {
-    Name    = "firefly-sandbox-ghost"
-    purpose = "firefly-sandbox"
+    Name    = "acme-prod-ghost"
+    purpose = "acme-prod"
   }
-  vpc_id = "vpc-037dc00595a0092f8"
+  vpc_id = "vpc-0a9f81e0f33455180"
   # The following attributes have default values introduced when importing the resource into terraform: [revoke_rules_on_delete timeouts]
   lifecycle {
     ignore_changes = [revoke_rules_on_delete, timeouts]
