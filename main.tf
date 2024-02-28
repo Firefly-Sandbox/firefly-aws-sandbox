@@ -1,3 +1,12 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "4.8.0"
+    }
+  }
+}
+
 provider "aws" {
   region = "us-east-1"
 }
@@ -61,7 +70,7 @@ resource "aws_lambda_function" "acme-prod-lambda" {
   handler       = "index.handler"
   //role          = "arn:aws:iam::821020995254:role/acme-prod-lamdba-role"
   role          = "${aws_iam_role.acme-prod-lamdba-role.arn}"
-  runtime       = "nodejs18.x"
+  runtime       = "nodejs14.x"
   s3_bucket     = "firefly-lambda-zipstor"
   s3_key        = "firefly-demo-lambda.zip"
   tags = {
