@@ -1,0 +1,70 @@
+name: Deploy acme-aws-prod Terraform Workspace
+"on":
+    push:
+        branches:
+            - main
+    pull_request:
+        branches:
+            - main
+    workflow_dispatch:
+        inputs:
+            apply:
+                description: Should apply Terraform changes?
+                type: boolean
+                default: false
+jobs:
+    deploy:
+        name: Deploy Terraform Workspace
+        runs-on: ubuntu-latest
+        env:
+            FIREFLY_ACCESS_KEY: ${{ secrets.FIREFLY_ACCESS_KEY }}
+            FIREFLY_SECRET_KEY: ${{ secrets.FIREFLY_SECRET_KEY }}
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v4
+              with:
+                fetch-depth: 0
+            - name: Set deployment parameters
+              id: set-params
+              run: |-
+                if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+                  echo "apply=${{ github.event.inputs.apply }}" >> $GITHUB_OUTPUT
+                elif [ "${{ github.event_name }}" = "push" ] && [ "${{ github.ref }}" = "refs/heads/main" ]; then
+                  echo "apply=true" >> $GITHUB_OUTPUT
+                else
+                  echo "apply=false" >> $GITHUB_OUTPUT
+                fi
+            - name: Setup Terraform
+              uses: hashicorp/setup-terraform@v3
+              with:
+                terraform_version: 1.8.1
+                terraform_wrapper: false
+            - name: Terraform Init
+              run: terraform init
+            - name: Terraform Plan
+              id: terraform-plan
+              run: terraform plan -json -out=tf.plan > plan_log.jsonl && terraform show -json tf.plan > plan_output.json && terraform show tf.plan > plan_output_raw.log
+              continue-on-error: true
+            - name: Firefly Post Plan
+              uses: gofireflyio/fireflyci@v0.2.15
+              with:
+                command: post-plan
+                context: ""
+                plan-log-file: plan_log.jsonl
+                plan-out-raw-file: plan_output_raw.log
+                plan-output-file: plan_output.json
+                workspace: acme-aws-prod
+              continue-on-error: true
+            - name: Terraform Apply
+              if: steps.set-params.outputs.apply == 'true' && steps.terraform-plan.outcome == 'success'
+              run: terraform apply -auto-approve -json > apply_log.jsonl
+              continue-on-error: true
+            - name: Firefly Post Apply
+              if: steps.set-params.outputs.apply == 'true' && steps.terraform-plan.outcome == 'success'
+              uses: gofireflyio/fireflyci@v0.2.15
+              with:
+                apply-log-file: apply_log.jsonl
+                command: post-apply
+                context: ""
+                workspace: acme-aws-prod
+              continue-on-error: true
