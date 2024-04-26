@@ -20,6 +20,11 @@ jobs:
             FIREFLY_ACCESS_KEY: ${{ secrets.FIREFLY_ACCESS_KEY }}
             FIREFLY_SECRET_KEY: ${{ secrets.FIREFLY_SECRET_KEY }}
         steps:
+            - name: Configure aws credentials
+              uses: aws-actions/configure-aws-credentials@v2
+              with:
+                role-to-assume: arn:aws:iam::590184073875:role/GItHubActions
+                aws-region: us-east-1
             - name: Checkout Repository
               uses: actions/checkout@v4
               with:
