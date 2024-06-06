@@ -60,7 +60,7 @@ resource "aws_dynamodb_table" "acme-prod-dynamodb" {
   tags = {
     purpose = "acme-prod"
   }
-  write_capacity = 1
+  write_capacity = 2
 }
 
 resource "aws_lambda_function" "acme-prod-lambda" {
