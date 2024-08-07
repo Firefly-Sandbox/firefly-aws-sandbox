@@ -117,9 +117,9 @@ resource "aws_security_group" "acme-prod-drift" {
   }
   ingress {
     cidr_blocks = ["0.0.0.0/0"]
-    from_port   = 22
+    from_port   = 3389
     protocol    = "tcp"
-    to_port     = 22
+    to_port     = 3389
   }
   name = "acme-prod-drift"
   tags = {
