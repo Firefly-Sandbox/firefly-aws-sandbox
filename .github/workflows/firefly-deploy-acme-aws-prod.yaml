@@ -60,7 +60,7 @@ jobs:
               run: terraform plan -json -out=tf.plan > plan_log.jsonl && terraform show -json tf.plan > plan_output.json && terraform show tf.plan > plan_output_raw.log
               continue-on-error: true
             - name: Firefly Post Plan
-              uses: gofireflyio/fireflyci@v0.5.34
+              uses: gofireflyio/fireflyci@v0.5.51
               with:
                 command: post-plan
                 context: ""
@@ -75,7 +75,7 @@ jobs:
               continue-on-error: true
             - name: Firefly Post Apply
               if: steps.set-params.outputs.apply == 'true' && steps.plan.outcome == 'success'
-              uses: gofireflyio/fireflyci@v0.5.34
+              uses: gofireflyio/fireflyci@v0.5.51
               with:
                 apply-log-file: apply_log.jsonl
                 command: post-apply
