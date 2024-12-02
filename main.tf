@@ -133,7 +133,7 @@ resource "aws_security_group" "acme-prod-drift" {
   }
 }
 
-resource "aws_security_group" "acme-prod-ghost" {
+/*resource "aws_security_group" "acme-prod-ghost" {
   description = "sandbox ghosted resources"
   egress {
     cidr_blocks = ["0.0.0.0/0"]
@@ -158,4 +158,4 @@ resource "aws_security_group" "acme-prod-ghost" {
     ignore_changes = [revoke_rules_on_delete, timeouts]
   }
 }
-
+*/
