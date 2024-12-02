@@ -55,7 +55,7 @@ resource "aws_dynamodb_table" "acme-prod-dynamodb" {
   }
   hash_key       = "acme-metadata"
   name           = "acme-prod-dynamodb"
-  read_capacity  = 1
+  read_capacity  = 2
   stream_enabled = false
   tags = {
     purpose = "acme-prod"
