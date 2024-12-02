@@ -48,6 +48,14 @@ resource "aws_s3_bucket_ownership_controls" "acme-prod-s3" {
   }
 }
 
+resource "aws_s3_bucket_versioning" "acme-prod-s3" {
+  bucket = aws_s3_bucket.acme-prod-s3.id
+  versioning_configuration {
+    status = "Enabled"
+    mfa_delete = "Enabled"
+  }
+}
+
 resource "aws_dynamodb_table" "acme-prod-dynamodb" {
   attribute {
     name = "acme-metadata"
@@ -158,4 +166,3 @@ resource "aws_security_group" "acme-prod-ghost" {
     ignore_changes = [revoke_rules_on_delete, timeouts]
   }
 }
-
