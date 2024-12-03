@@ -100,7 +100,7 @@ resource "aws_iam_role" "acme-prod-lamdba-role" {
   ]
 })
   description         = "Allows Lambda functions to call AWS services on your behalf."
-  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
+  managed_policy_arns = ["arn:aws:iam::aws:policy/ReadOnlyAccess", "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
   name                = "acme-prod-lamdba-role"
   tags = {
     purpose = "acme-prod"
@@ -158,4 +158,3 @@ resource "aws_security_group" "acme-prod-ghost" {
     ignore_changes = [revoke_rules_on_delete, timeouts]
   }
 }
-
