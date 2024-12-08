@@ -27,6 +27,13 @@ resource "aws_s3_bucket" "acme-prod-s3" {
   }
 }
 
+resource "aws_s3_bucket_versioning" "acme-prod-s3" {
+  bucket = aws_s3_bucket.acme-prod-s3.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
 resource "aws_s3_bucket_server_side_encryption_configuration" "acme-prod-s3" {
   bucket = "${aws_s3_bucket.acme-prod-s3.id}"
   rule {
@@ -158,4 +165,3 @@ resource "aws_security_group" "acme-prod-ghost" {
     ignore_changes = [revoke_rules_on_delete, timeouts]
   }
 }
-
